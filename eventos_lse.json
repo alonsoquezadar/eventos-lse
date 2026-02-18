@@ -1,0 +1,90 @@
+[
+    {
+        "titulo": "SPP EDI Student Town Hall",
+        "fecha": "2026-02-17",
+        "hora": "12.30-2.00pm",
+        "lugar": "LSESU Hall Carpenter Room (3rd floor SAW)",
+        "link": null,
+        "CATEGORIA": "Social"
+    },
+    {
+        "titulo": "Dean’s Dialogue with Professor Andrés Velasco and Professor Sandra Sequeira",
+        "fecha": "2026-02-24",
+        "hora": "1.00pm-2.30pm",
+        "lugar": "To be announced upon registration",
+        "link": null,
+        "CATEGORIA": "Academico"
+    },
+    {
+        "titulo": "Policy in Practice seminar with Jonathan Roberts: “Philanthropy and public policy: capital, innovation – and justice?”",
+        "fecha": "2026-02-17",
+        "hora": "4.00-5.30pm",
+        "lugar": "To be announced upon registration",
+        "link": null,
+        "CATEGORIA": "Academico"
+    },
+    {
+        "titulo": "Turn pressure into progress: Get Ready for Exams in Ways That Work for You",
+        "fecha": "2026-02-19",
+        "hora": "2.00pm-3:30pm",
+        "lugar": "To be announced upon registration",
+        "link": null,
+        "CATEGORIA": "Skills"
+    },
+    {
+        "titulo": "Mindful Exams- Balancing Study and Self Care",
+        "fecha": "2026-03-19",
+        "hora": "2.00pm-3.00pm",
+        "lugar": "To be announced upon registration",
+        "link": null,
+        "CATEGORIA": "Skills"
+    },
+    {
+        "titulo": "Narratives in policymaking",
+        "fecha": "2026-02-17",
+        "hora": "6.30pm-8.00pm",
+        "lugar": "Sheikh Zayed Theatre, Cheng Kin Ku Building (in person) and online",
+        "link": null,
+        "CATEGORIA": "Academico"
+    },
+    {
+        "titulo": "Addressing Online Gender Based Violence: The Role of Educational Institutions, Tech Platforms, and Policy",
+        "fecha": "2026-02-19",
+        "hora": "5.30pm- 7.00pm",
+        "lugar": "LSE Centre Building, CBG1.07",
+        "link": null,
+        "CATEGORIA": "Academico"
+    },
+    {
+        "titulo": "Comparative Insights from the Canadian Municipal Barometer",
+        "fecha": "2026-02-23",
+        "hora": "4.00pm - 5.00pm",
+        "lugar": "LSE Campus (specific room to be confirmed upon registration)",
+        "link": null,
+        "CATEGORIA": "Academico"
+    },
+    {
+        "titulo": "Royal Courts of Justice Tour",
+        "fecha": "2026-02-26",
+        "hora": "3.15pm",
+        "lugar": "Royal Courts of Justice",
+        "link": null,
+        "CATEGORIA": "Social"
+    },
+    {
+        "titulo": "Working in Government: What I Wish I'd Known Alumni Q&A Panel",
+        "fecha": "2026-02-27",
+        "hora": "1.00pm-2.00pm",
+        "lugar": "Online event (Zoom)",
+        "link": null,
+        "CATEGORIA": "Carrera"
+    },
+    {
+        "titulo": "Devolution Economics: Can local decision making strengthen Britain’s economies?",
+        "fecha": "2026-03-02",
+        "hora": "6.30pm-7.45pm",
+        "lugar": "Old Theatre, Old Building (in-person) and online",
+        "link": null,
+        "CATEGORIA": "Academico"
+    }
+]
