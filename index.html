@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LSE MPA | Calendario Académico</title>
+    
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <script src='https://cdn.jsdelivr.net/npm/fullcalendar@6.1.11/index.global.min.js'></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <style>
+        :root {
+            --primary-red: #D01C1C;
+            --dark-bg: #1A1A1A;
+            --light-bg: #F8F9FA;
+            --text-main: #333333;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--light-bg);
+            color: var(--text-main);
+            margin: 0; padding: 0;
+            display: flex; flex-direction: column; align-items: center;
+        }
+
+        header {
+            background-color: var(--dark-bg); color: white; width: 100%; padding: 20px 0;
+            text-align: center; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border-bottom: 4px solid var(--primary-red);
+        }
+        header h1 { margin: 0; font-weight: 700; }
+        header p { margin: 5px 0 0 0; font-weight: 300; color: #CCCCCC; font-size: 0.9em; }
+
+        .legend-container {
+            display: flex; gap: 15px; flex-wrap: wrap; justify-content: center;
+            margin-top: 20px; padding: 10px 20px; background: white; border-radius: 8px; 
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        .legend-item { display: flex; align-items: center; font-size: 0.85em; font-weight: 600; }
+        .legend-dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 6px; }
+
+        #calendar-container {
+            width: 95%; max-width: 1200px; background: white; margin-top: 20px; margin-bottom: 40px;
+            padding: 30px; border-radius: 12px; box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .fc-theme-standard .fc-scrollgrid { border-color: #E0E0E0; }
+        .fc-col-header-cell { background-color: #F1F3F5; padding: 10px 0; font-weight: 600; }
+        .fc-daygrid-day-number { color: var(--text-main); font-weight: 600; text-decoration: none;}
+        
+        .fc-event, .fc-timegrid-event .fc-event-main {
+            border: none !important;
+            border-radius: 4px; padding: 4px 6px; color: white !important;
+            cursor: pointer; transition: transform 0.2s, box-shadow 0.2s; margin-bottom: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .fc-daygrid-event-dot { display: none; } 
+        .fc-event-time { display: none !important; }
+        
+        .fc-event:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+            filter: brightness(1.05);
+        }
+
+        .fc-button-primary { background-color: var(--dark-bg) !important; border-color: var(--dark-bg) !important; }
+        .fc-button-primary:hover { background-color: var(--primary-red) !important; }
+
+        .btn-registro {
+            display: inline-block; margin-top: 15px; padding: 10px 20px; background-color: var(--dark-bg); 
+            color: white !important; text-decoration: none; border-radius: 6px; font-weight: 600;
+        }
+        .btn-registro:hover { background-color: var(--primary-red); }
+        
+        .cat-badge {
+            display: inline-block; padding: 4px 10px; border-radius: 12px; 
+            color: white; font-size: 0.8em; font-weight: bold; margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Academic Events Dashboard</h1>
+        <p>Clasificación y actualización autónoma mediante IA</p>
+    </header>
+
+    <div class="legend-container">
+        <div class="legend-item"><div class="legend-dot" style="background: #D01C1C;"></div>Académico</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #0056b3;"></div>Carrera Profesional</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #28a745;"></div>Skills/Talleres</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #6f42c1;"></div>Social/Bienestar</div>
+        <div class="legend-item"><div class="legend-dot" style="background: #6c757d;"></div>Otro</div>
+    </div>
+
+    <div id="calendar-container">
+        <div id="calendar"></div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            
+            const colorMap = {
+                'Academico': '#D01C1C', 
+                'Carrera': '#0056b3',   
+                'Skills': '#28a745',    
+                'Social': '#6f42c1',    
+                'Otro': '#6c757d'       
+            };
+
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: {
+                    left: 'prev,next today',
+                    center: 'title',
+                    right: 'dayGridMonth,timeGridWeek,listMonth' 
+                },
+                firstDay: 1, height: 'auto', slotMinTime: '08:00:00', slotMaxTime: '22:00:00',
+                
+                eventContent: function(info) {
+                    const hora = info.event.extendedProps.hora || 'Horario a confirmar';
+                    const horaCorta = hora !== 'null' ? hora.split('-')[0].trim() : '';
+                    
+                    return {
+                        html: `
+                            <div style="white-space: normal; line-height: 1.2; overflow: hidden;">
+                                <div style="font-weight: 700; font-size: 0.85em; margin-bottom: 2px;">${info.event.title}</div>
+                                ${horaCorta ? `<div style="font-size: 0.75em; opacity: 0.9; border-top: 1px solid rgba(255,255,255,0.3); padding-top: 1px;">🕒 ${horaCorta}</div>` : ''}
+                            </div>
+                        `
+                    };
+                },
+                
+                eventClick: function(info) {
+                    const props = info.event.extendedProps;
+                    const lugarInfo = props.lugar && props.lugar !== 'null' ? props.lugar : '📍 Por confirmar';
+                    const catColor = colorMap[props.categoria] || colorMap['Otro'];
+                    const horaTexto = props.hora && props.hora !== 'null' ? props.hora : 'Por confirmar';
+                    
+                    let linkHtml = props.link && props.link !== 'null' 
+                        ? `<a href="${props.link}" target="_blank" class="btn-registro">Ir a la página oficial</a>` : '';
+
+                    Swal.fire({
+                        html: `
+                            <div style="text-align: left;">
+                                <span class="cat-badge" style="background-color: ${catColor};">${props.categoria || 'Evento'}</span>
+                                <h2 style="margin: 10px 0; color: #333;">${info.event.title}</h2>
+                                <hr style="border: 0; border-top: 1px solid #eee; margin-bottom: 15px;">
+                                <div style="line-height: 1.8; font-size: 1.05em;">
+                                    <strong>📅 Fecha:</strong> ${info.event.start.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' })}<br>
+                                    <strong>⏰ Hora:</strong> ${horaTexto}<br>
+                                    <strong>🏢 Lugar:</strong> ${lugarInfo}
+                                </div>
+                                <br>
+                                <div style="text-align: center;">${linkHtml}</div>
+                            </div>
+                        `,
+                        showConfirmButton: false, showCloseButton: true, width: '500px'
+                    });
+                }
+            });
+            calendar.render();
+
+            fetch('eventos_lse.json')
+                .then(response => response.json())
+                .then(data => {
+                    const eventosFormateados = data.map(evento => {
+                        let fechaInicio = new Date(evento.fecha);
+                        let esTodoElDia = true;
+
+                        if (evento.hora && evento.hora !== 'null') {
+                            let horaCompleta = evento.hora.toLowerCase();
+                            let horaInicioTexto = horaCompleta.split('-')[0].trim();
+                            
+                            if (!horaInicioTexto.includes('am') && !horaInicioTexto.includes('pm')) {
+                                if (horaCompleta.includes('pm')) horaInicioTexto += 'pm';
+                                else if (horaCompleta.includes('am')) horaInicioTexto += 'am';
+                            }
+
+                            const match = horaInicioTexto.match(/(\d+)(?:[:.](\d+))?\s*(am|pm)?/);
+                            if (match) {
+                                let horas = parseInt(match[1], 10);
+                                let minutos = match[2] ? parseInt(match[2], 10) : 0;
+                                let ampm = match[3];
+
+                                if (ampm === 'pm' && horas < 12) horas += 12;
+                                if (ampm === 'am' && horas === 12) horas = 0;
+                                if (!ampm && horas >= 1 && horas <= 7) horas += 12;
+
+                                fechaInicio.setHours(horas, minutos);
+                                esTodoElDia = false;
+                            }
+                        }
+
+                        const categoriaIA = evento.categoria || evento.CATEGORIA || 'Otro';
+                        
+                        let catNormalizada = categoriaIA;
+                        if(categoriaIA.toLowerCase() === 'académico' || categoriaIA.toLowerCase() === 'academico') {
+                            catNormalizada = 'Academico';
+                        }
+                        
+                        const colorAsignado = colorMap[catNormalizada] || colorMap['Otro'];
+
+                        return {
+                            title: evento.titulo,
+                            start: fechaInicio,
+                            allDay: esTodoElDia,
+                            display: 'block', // <--- ¡AQUÍ ESTÁ LA SOLUCIÓN MÁGICA!
+                            backgroundColor: colorAsignado,
+                            borderColor: colorAsignado,
+                            extendedProps: {
+                                hora: evento.hora, 
+                                lugar: evento.lugar, 
+                                link: evento.link,
+                                categoria: catNormalizada 
+                            }
+                        };
+                    });
+                    
+                    calendar.addEventSource(eventosFormateados);
+                })
+                .catch(error => {
+                    console.error('Error cargando JSON:', error);
+                });
+        });
+    </script>
+</body>
+</html>

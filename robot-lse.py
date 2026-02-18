@@ -12,7 +12,8 @@ import google.generativeai as genai
 
 # CONFIGURACIÓN
 SCOPES = ['https://www.googleapis.com/auth/gmail.readonly']
-GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+#GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY")
+GEMINI_API_KEY = "AIzaSyAxsPigqRrsifgUqDW1e4t0L6ujS-wpIPM"
 REMITENTE = "a.a.quezada@lse.ac.uk"
 
 def obtener_newsletter_robusto():
@@ -76,35 +77,44 @@ def obtener_newsletter_robusto():
 def procesar_ia_robusto(texto):
     print(f"🚀 [PASO 4] Enviando texto limpio a Gemini AI ({len(texto)} caracteres)...")
     genai.configure(api_key=GEMINI_API_KEY)
-    model = genai.GenerativeModel('gemini-2.5-flash')
+    # Usamos un modelo un poco más capaz para la tarea de categorización
+    model = genai.GenerativeModel('gemini-2.5-flash') 
     
     prompt = f"""
-    Extrae los eventos académicos del siguiente texto. 
-    Devuelve ÚNICAMENTE un array JSON válido con las claves: titulo, fecha, hora, lugar, link.
-    Texto: {texto[:10000]}
+    Eres un analista de datos académicos. Tu tarea es extraer eventos del siguiente texto de un newsletter de la LSE.
+    
+    Para cada evento, debes extraer: titulo, fecha (YYYY-MM-DD), hora, lugar, link, y asignar una CATEGORIA.
+    
+    Las categorías permitidas son ÚNICAMENTE: 
+    - "Carrera": Eventos de empleo, CV, entrevistas, alumni careers.
+    - "Academico": Charlas, seminarios, conferencias, lanzamientos de libros.
+    - "Skills": Talleres de habilidades, programación, métodos, escritura.
+    - "Social": Town halls, café, networking, bienestar.
+    - "Otro": Si no encaja claramente en las anteriores.
+
+    Devuelve ÚNICAMENTE un array JSON válido con objetos que tengan estas claves exactas.
+    Texto: {texto[:15000]}
     """
     
     try:
         start_time = time.time()
-        response = model.generate_content(prompt)
-        print(f"  - IA respondió en {round(time.time() - start_time, 2)} segundos.")
+        # Aumentamos un poco la "temperatura" para permitirle ser creativo clasificando
+        response = model.generate_content(prompt, generation_config=genai.types.GenerationConfig(temperature=0.3))
+        print(f"  - IA respondió y categorizó en {round(time.time() - start_time, 2)} segundos.")
         
         json_limpio = response.text.strip().removeprefix('```json').removesuffix('```').strip()
         
-        # Validamos que sea JSON real antes de guardarlo
+        # Validamos
         datos_json = json.loads(json_limpio)
         
         with open('eventos_lse.json', 'w', encoding='utf-8') as f:
             json.dump(datos_json, f, indent=4, ensure_ascii=False)
             
-        print("✅ PROCESO COMPLETADO EXITOSAMENTE.")
-        print("Datos guardados en 'eventos_lse.json'.")
+        print(f"✅ PROCESO COMPLETADO. Se han guardado y categorizado {len(datos_json)} eventos.")
         
-    except json.JSONDecodeError:
-        print("❌ Error: La IA no devolvió un JSON válido. Respuesta cruda:")
-        print(response.text)
     except Exception as e:
-        print(f"❌ Error inesperado: {e}")
+        print(f"❌ Error: {e}")
+        # print(response.text) # Descomenta esto si necesitas depurar la respuesta cruda
 
 if __name__ == "__main__":
     content = obtener_newsletter_robusto()
