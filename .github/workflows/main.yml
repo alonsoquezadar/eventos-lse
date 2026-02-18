@@ -1,0 +1,42 @@
+name: Robot LSE Newsletter
+
+# ¿Cuándo se ejecuta?
+on:
+  schedule:
+    - cron: '0 9 * * *' # Todos los días a las 9:00 AM (Hora UTC)
+  workflow_dispatch: # Te pone un botón para ejecutarlo manualmente cuando quieras
+
+jobs:
+  actualizar_calendario:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Descargar el repositorio
+        uses: actions/checkout@v3
+
+      - name: Instalar Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Instalar librerías
+        run: pip install -r requirements.txt
+
+      - name: Reconstruir llaves secretas
+        run: |
+          echo '${{ secrets.GMAIL_CREDENTIALS }}' > credentials.json
+          echo '${{ secrets.GMAIL_TOKEN }}' > token.json
+
+      - name: Ejecutar el Robot
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: python robot_lse.py
+
+      - name: Guardar cambios en GitHub (Actualizar JSON)
+        run: |
+          git config --global user.name "Robot LSE"
+          git config --global user.email "robot@lse.github.io"
+          git add eventos_lse.json
+          # Solo hace commit si hay cambios nuevos
+          git diff --quiet && git diff --staged --quiet || git commit -m "🤖 Calendario actualizado automáticamente"
+          git push
